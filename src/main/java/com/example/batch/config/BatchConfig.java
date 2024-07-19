@@ -8,6 +8,7 @@ import com.example.batch.model.Player;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
@@ -31,6 +32,7 @@ public class BatchConfig {
     private final DemoExcelProcessor demoExcelProcessor;
     private final DemoExcelWriter demoExcelWriter;
 
+    @Bean
     public Job demoExcelJob(Step demoExcelStep) {
         return new JobBuilder("demoExcelJob", jobRepository)
                 .start(demoExcelStep)
@@ -38,6 +40,7 @@ public class BatchConfig {
     }
 
     @Bean
+    @JobScope
     public Step demoExcelStep(PlatformTransactionManager platformTransactionManager,
                               FlatFileItemReader<Player> demoExcelItemReader) {
         return new StepBuilder("demoExcelStep", jobRepository)
@@ -59,7 +62,7 @@ public class BatchConfig {
         lineMapper.setFieldSetMapper(new PlayerFieldSetMapper());
         reader.setLineMapper(lineMapper);
         reader.open(new ExecutionContext());
-        Player giocatore = reader.read();
+        Player player = reader.read();
         return reader;
     }
 }
